@@ -1,0 +1,9 @@
+{
+  "name": "峰哥",
+  "age": 30,
+  "gender": "male",
+  "hobbies": [
+    "reading",
+    "talking"
+  ]
+}
