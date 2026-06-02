@@ -20,7 +20,7 @@ st.title("AI智能体设置")
 st.logo("../resource/logo.png")
 
 #系统提示词
-system_prompt = "你的昵称是%s,你的性格是%s"
+system_prompt = "你的昵称是%s,你的性格是%s,每次和用户对话时都只能用一句话回复，像微信对话一样"
 
 
 #初始化聊天信息
