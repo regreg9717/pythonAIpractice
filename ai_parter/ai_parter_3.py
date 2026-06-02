@@ -88,7 +88,7 @@ if prompt:
             response_message.chat_message("assistant").write(full_response)
 
 
-    #保存大模型返回的消息
+    #保存大模型返回消息
 
     #这是流式输出的返回结果
     # st.session_state.messages.append({"role": "assistant", "content": response.choices[0].message.content})
