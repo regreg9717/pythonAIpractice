@@ -44,8 +44,23 @@ def load_sessions():
             if filename.endswith(".json"):
                 session_list.append(filename[:-5])
     return session_list
+
+#加载指定会话信息
+def load_session(session_name):
+    try:
+        if os.path.exists(f"sessions/{session_name}.json"):
+            # 读取会话信息
+            with open(f"sessions/{session_name}.json", "r", encoding="utf-8") as f:
+                session_data = json.load(f)
+                st.session_state.messages = session_data["messages"]
+                st.session_state.nick_name = session_data["nick_name"]
+                st.session_state.nature = session_data["nature"]
+                st.session_state.current_session = session_name
+    except Exception:
+        st.error("加载会话失败!")
+
 # 标题
-st.title("AI智能体设置")
+st.title("AI智能体")
 
 # logo
 st.logo("../resource/logo.png")
@@ -65,11 +80,12 @@ if "nature" not in st.session_state:
 
 #会话标识
 if "current_session" not in st.session_state:
-    print(datetime.now().strftime("%Y-%m-%d %H-%M-%S"))
+    # print(datetime.now().strftime("%Y-%m-%d %H-%M-%S"))
     st.session_state.current_session = datetime.now().strftime("%Y-%m-%d %H-%M-%S")
 
 
 #展示聊天信息
+st.text(f"当前会话：{st.session_state.current_session}")
 for message in st.session_state.messages:
     if message["role"] == "user":
         st.chat_message("user").write(message["content"])
@@ -101,8 +117,9 @@ with st.sidebar:
     for session in session_list:
         col1,col2=st.columns([4,1])
         with col1:
-            if st.button(session,width="stretch",icon="🤡",key=f"load_{session}"):
-                pass
+            if st.button(session,width="stretch",icon="🤡",key=f"load_{session}",type="primary" if session==st.session_state.current_session else "secondary"):
+                load_session( session)
+                st.rerun()
         with col2:
             if st.button("",width="stretch",icon="😂",key=f"delete_{session}"):
                 pass
@@ -156,6 +173,7 @@ if prompt:
 
     st.session_state.messages.append({"role": "assistant", "content": full_response})
 
-
+    #保存会话信息
+    save_session()
 
 
