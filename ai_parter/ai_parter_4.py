@@ -2,6 +2,8 @@ import streamlit as st
 import os
 from openai import OpenAI
 from datetime import datetime
+from streamlit import session_state
+import json
 
 # 设置页面的配置项
 st.set_page_config(
@@ -13,6 +15,24 @@ st.set_page_config(
     initial_sidebar_state="expanded",
     menu_items={}
 )
+#生成会话标识函数
+def generate_session_name():
+    return datetime.now().strftime("%Y-%m-%d %H-%M-%S")
+
+#保存会话信息的函数
+def save_session():
+    if st.session_state.current_session:
+        session_data = {
+            "nick_name": st.session_state.nick_name,
+            "nature": st.session_state.nature,
+            "current_session": st.session_state.current_session,
+            "messages": st.session_state.messages
+        }
+
+        if not os.path.exists("sessions"):
+            os.mkdir("sessions")
+        with open(f"sessions/{st.session_state.current_session}.json", "w", encoding="utf-8") as f:
+            json.dump(session_data, f, ensure_ascii=False, indent=2)
 
 # 标题
 st.title("AI智能体设置")
@@ -35,7 +55,8 @@ if "nature" not in st.session_state:
 
 #会话标识
 if "current_session" not in st.session_state:
-    print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    print(datetime.now().strftime("%Y-%m-%d %H-%M-%S"))
+    st.session_state.current_session = datetime.now().strftime("%Y-%m-%d %H-%M-%S")
 
 
 #展示聊天信息
@@ -53,6 +74,15 @@ client = OpenAI(
 
 #设置左侧侧边栏
 with st.sidebar:
+    st.subheader("AI控制面板")
+
+    if st.button("新建会话",width="stretch",icon="😀"):
+        save_session()
+
+        st.session_state.messages = []
+        st.session_state.current_session = generate_session_name()
+        save_session()
+        st.rerun() #重新运行当前页面
 
     st.subheader("智能体信息")
     nick_name = st.text_input("请输入你的昵称",placeholder="请输入你的昵称",value=st.session_state.nick_name)
@@ -73,7 +103,7 @@ if prompt:
     #调用AI大模型
     with st.spinner("思考中..."):
         response = client.chat.completions.create(
-            model="deepseek-v4-flash",
+            model="deepseek-chat",
             messages=[{"role": "system", "content": system_prompt % (st.session_state.nick_name,st.session_state.nature)},
                 *st.session_state.messages
             ],
