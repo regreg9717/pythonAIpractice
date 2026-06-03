@@ -2,7 +2,6 @@ import streamlit as st
 import os
 from openai import OpenAI
 from datetime import datetime
-from streamlit import session_state
 import json
 
 # 设置页面的配置项
@@ -34,6 +33,17 @@ def save_session():
         with open(f"sessions/{st.session_state.current_session}.json", "w", encoding="utf-8") as f:
             json.dump(session_data, f, ensure_ascii=False, indent=2)
 
+
+#加载所有会话信息
+def load_sessions():
+    session_list = []
+    #加载sessions目录下的文件
+    if os.path.exists("sessions"):
+        file_list = os.listdir("sessions")
+        for filename in file_list:
+            if filename.endswith(".json"):
+                session_list.append(filename[:-5])
+    return session_list
 # 标题
 st.title("AI智能体设置")
 
@@ -41,7 +51,7 @@ st.title("AI智能体设置")
 st.logo("../resource/logo.png")
 
 #系统提示词
-system_prompt = "你的昵称是%s,你的性格是%s,每次和用户对话时都只能用一句话回复，像微信对话一样。"
+system_prompt = "你的昵称是%s,你的性格是%s,每次和用户对话时都只能用一句话回复，像微信聊天一样。"
 
 
 #初始化聊天信息
@@ -79,10 +89,24 @@ with st.sidebar:
     if st.button("新建会话",width="stretch",icon="😀"):
         save_session()
 
-        st.session_state.messages = []
-        st.session_state.current_session = generate_session_name()
-        save_session()
-        st.rerun() #重新运行当前页面
+        if st.session_state.messages:#如果聊天信息非空，则创建下一个json，否则不建
+            st.session_state.messages = []
+            st.session_state.current_session = generate_session_name()
+            save_session()
+            st.rerun()  # 重新运行当前页面
+
+    #加载会话历史
+    st.text("会话历史")
+    session_list=load_sessions()
+    for session in session_list:
+        col1,col2=st.columns([4,1])
+        with col1:
+            if st.button(session,width="stretch",icon="🤡",key=f"load_{session}"):
+                pass
+        with col2:
+            if st.button("",width="stretch",icon="😂",key=f"delete_{session}"):
+                pass
+        # st.button(session,width="stretch")
 
     st.subheader("智能体信息")
     nick_name = st.text_input("请输入你的昵称",placeholder="请输入你的昵称",value=st.session_state.nick_name)
