@@ -43,6 +43,7 @@ def load_sessions():
         for filename in file_list:
             if filename.endswith(".json"):
                 session_list.append(filename[:-5])
+    session_list.sort(reverse=True) #排序, 降序排列
     return session_list
 
 #加载指定会话信息
@@ -59,6 +60,17 @@ def load_session(session_name):
     except Exception:
         st.error("加载会话失败!")
 
+#删除指定会话信息
+def delete_session(session_name):
+    try:
+        if os.path.exists(f"sessions/{session_name}.json"):
+            os.remove(f"sessions/{session_name}.json")
+            #如果删除的是当前的会话，删除后，应该不会再显示会话内容
+            if session_name==st.session_state.current_session:
+                st.session_state.messages = []
+                st.session_state.current_session = generate_session_name()
+    except:
+        st.error("删除会话失败!")
 # 标题
 st.title("AI智能体")
 
@@ -122,8 +134,12 @@ with st.sidebar:
                 st.rerun()
         with col2:
             if st.button("",width="stretch",icon="😂",key=f"delete_{session}"):
-                pass
+                delete_session(session)
+                st.rerun ()
         # st.button(session,width="stretch")
+
+    #分割线
+    st.divider()
 
     st.subheader("智能体信息")
     nick_name = st.text_input("请输入你的昵称",placeholder="请输入你的昵称",value=st.session_state.nick_name)
