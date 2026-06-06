@@ -12,7 +12,7 @@ with open("仙逆人物志.html","r",encoding="UTF-8") as f:
     document=html.fromstring(html_text)
 
     #解析表头
-    th_list=document.xpath("//table/thead/tr/th/text()")
+    th_list=document.xpath("//table/thead/tr/th/text()") #双斜杠表示从当前结点开始，单斜杠是从根节点开始的
     print(th_list)
     #获取所有行的数据
     tr_list=document.xpath("//table/tbody/tr")
