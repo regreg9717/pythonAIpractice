@@ -6,6 +6,10 @@ from  lxml import html
 TMDB_BASE_URL="https://www.themoviedb.org"
 TMDB_TOP_URL="https://www.themoviedb.org/movie/top-rated"
 
+#获取电影详情
+def get_movie_info(movie_info_url):
+    pass
+
 def main():
     #发送请求，获取高分电影榜单数据
     response=requests.get(TMDB_TOP_URL,timeout=60)
